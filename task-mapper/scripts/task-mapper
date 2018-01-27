@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+import sys
+import os
+import multiprocessing
+import subprocess
+import argparse
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, wait, ALL_COMPLETED
+
+
+class CommandExecutor(object):
+    def __init__(self, file, command):
+        self._file = file
+        self._command = command
+
+    @property
+    def file(self):
+        return self._file
+
+    @property
+    def command(self):
+        return self._command
+
+    def run(self, file, command):
+        subprocess.check_output(self.command.split() + [self.file])
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--files', '-f', required=True,
+                        type=argparse.FileType('r'), nargs='+')
+    parser.add_argument('--command', '-c', required=True,
+                        help='Command applied to all files given.', type=str, dest='command')
+    parser.add_argument('--executors', '-j',
+                        help='Ammount of processes or threads allowed.', type=int, default=4, dest='executors')
+    parser.add_argument('--executor-type', '-e',
+                        help='Type of Executor', type=str, choices=['process', 'thread'], default='process', dest='executor_type')
+    args = parser.parse_args()
+    executor = ThreadPoolExecutor if args.executor_type == "thread" else ProcessPoolExecutor
+    with executor(max_workers=args.executors) as e:
+        executors = [CommandExecutor(file, args.command) for file in [
+            os.path.realpath(file.name) for file in args.files]]
+        work = {e.submit(executor.run, executor.file, executor.command): executor for executor in executors}
+        wait(work, timeout=None, return_when=ALL_COMPLETED)
