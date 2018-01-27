@@ -21,7 +21,7 @@ optional arguments:
                         Type of Executor
 ```
 
-### example:
+### example
 
 compress all png files in a directory using optipng:
 ```
