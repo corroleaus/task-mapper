@@ -9,7 +9,16 @@ Simple task distributor utilizing the python3 concurrent.futures packages.
 ```
 usage: task-mapper [-h] --files FILES [FILES ...] --command COMMAND
                    [--executors EXECUTORS] [--executor-type {process,thread}]
-task-mapper: error: the following arguments are required: --files/-f, --command/-c
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --files FILES [FILES ...], -f FILES [FILES ...]
+  --command COMMAND, -c COMMAND
+                        Command applied to all files given.
+  --executors EXECUTORS, -j EXECUTORS
+                        Ammount of processes or threads allowed.
+  --executor-type {process,thread}, -e {process,thread}
+                        Type of Executor
 ```
 
 ### example:
